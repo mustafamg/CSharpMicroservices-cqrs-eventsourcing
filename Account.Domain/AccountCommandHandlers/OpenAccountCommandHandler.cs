@@ -1,7 +1,6 @@
-﻿using Account.Domain.Dto;
-using Core;
+﻿using Core;
 using Core.Commands;
-using Core.Infrastructure;
+using Core.Exceptions;
 using Mediator;
 
 namespace Account.Domain.AccountCommands
@@ -14,18 +13,14 @@ namespace Account.Domain.AccountCommands
             this._eventSourcingHandler = eventSourcingHandler;
         }
 
-        public void Handle(BaseCommand command)
+        public async ValueTask<Unit> Handle(OpenAccountCommand command, CancellationToken cancellationToken)
         {
             if (command is OpenAccountCommand cmd)
             {
                 var aggregate = new AccountAggregate(cmd);
-                _eventSourcingHandler.Save(aggregate);
+                await _eventSourcingHandler.Save(aggregate);
             }
-        }
-
-        public ValueTask<Unit> Handle(OpenAccountCommand command, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+            return new Unit();
         }
     }
 }

@@ -7,6 +7,7 @@ using Account.Domain;
 using Account.Domain.AccountCommands;
 using System.Net;
 using Core.Exceptions;
+using Mediator;
 
 namespace Bank.Api.Controllers
 {
@@ -15,41 +16,35 @@ namespace Bank.Api.Controllers
     public class OpenAccountController : ControllerBase
     {
 
-        private readonly ILogger<OpenAccountController> _logger;
+        private readonly ILogger<OpenAccountController> logger;
+        private IMediator dispatcher;
 
-        public OpenAccountController(ILogger<OpenAccountController> logger, CommandDispatcher commandDispatcher)
+        public OpenAccountController(ILogger<OpenAccountController> logger, IMediator dispatcher)
         {
-            _logger = logger;
-            this._commandDispatcher = commandDispatcher;
+            this.logger = logger;
+            this.dispatcher = dispatcher;
         }
 
-        //[HttpGet(Name = "GetWeatherForecast")]
-        //public IEnumerable<int> Get()
-        //{
-        //    return Enumerable.Range(1, 5).ToArray();
-        //}
-        private CommandDispatcher _commandDispatcher;
-
         [HttpPost("OpenAccount")]
-        public ActionResult<bool> OpenAccount(OpenAccountCommand command)
+        public async Task<bool> OpenAccount(OpenAccountCommand command)
         {
             command.Id = Guid.NewGuid();
             try
             {
-                _commandDispatcher.Send(command);
+                await dispatcher.Send(command);
                 return true;
             }
             catch (IllegalStateException e)
             {
                 var msg = $"Client made a bad request - {e.Message}";
-                _logger.LogWarning(msg);
+                logger.LogWarning(msg);
                 throw new BadHttpRequestException(msg);
             }
             catch (Exception e)
             {
                 var msg = string.Format("Error while processing request to open a new bank account for id - {0}.", command.Id);
-                _logger.LogCritical(msg, e);
-                throw new ApplicationException(msg);
+                logger.LogCritical(msg, e);
+                throw;
             }
         }
     }

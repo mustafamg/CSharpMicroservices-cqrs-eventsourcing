@@ -9,7 +9,7 @@ namespace Core.Repositories
 {
     public interface IEventStore
     {
-        void SaveEvents(Guid aggregateId, IEnumerable<BaseEvent> events, int expectedVersion);
-        List<BaseEvent> GetEvents(Guid aggregateId);
+        Task SaveEvents(Guid aggregateId, IEnumerable<BaseEvent> events, int expectedVersion);
+        Task<List<BaseEvent>> GetEvents(Guid aggregateId);
     }
 }

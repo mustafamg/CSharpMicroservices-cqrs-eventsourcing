@@ -1,10 +1,10 @@
 ﻿using Account.Domain.Dto;
-using Core;
 using Core.Events;
+using Mediator;
 
 namespace Account.Domain.Events
 {
-    internal class AccountOpenedEvent:BaseEvent
+    internal class AccountOpenedEvent:BaseEvent, INotification
     {
         public string AccountHolder { get; private set; }
         public AccountType AccountType { get; private set; }
