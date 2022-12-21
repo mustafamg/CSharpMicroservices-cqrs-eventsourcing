@@ -5,8 +5,8 @@ namespace Account.Domain.AccountCommands
 {
     public class CloseAccountCommandHandler : ICommandHandler<CloseAccountCommand>
     {
-        readonly EventSourcingHandler<AccountAggregate> _eventSourcingHandler;
-        public CloseAccountCommandHandler(EventSourcingHandler<AccountAggregate> eventSourcingHandler)
+        readonly AccountEventSourcingHandler _eventSourcingHandler;
+        public CloseAccountCommandHandler(AccountEventSourcingHandler eventSourcingHandler)
         {
             _eventSourcingHandler = eventSourcingHandler;
         }

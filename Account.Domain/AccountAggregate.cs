@@ -2,16 +2,20 @@
 using Account.Domain.Events;
 using Core.Exceptions;
 using Cqrs.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Account.Domain
 {
     public class AccountAggregate : AggregateRoot
     {
-        public AccountAggregate() { 
+        public decimal Balance { get; private set; }
+        public bool Active { get; private set; }
+
+        public AccountAggregate()
+        { 
         //todo: do not use, created only to enale new T on GetById method of eventsourcing handler
         }
-        public bool Active { get; private set; }
-        public decimal Balance { get; private set; }
+
         public AccountAggregate(OpenAccountCommand command)
         {
             RaiseEvent(new AccountOpenedEvent(

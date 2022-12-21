@@ -4,7 +4,7 @@ using Mediator;
 
 namespace Account.Domain.Events
 {
-    internal class AccountOpenedEvent:BaseEvent, INotification
+    internal class AccountOpenedEvent:BaseEvent
     {
         public string AccountHolder { get; private set; }
         public AccountType AccountType { get; private set; }

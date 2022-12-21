@@ -2,6 +2,6 @@
 {
     public enum AccountType
     {
-        SAVINGS, CURRENT
+        Savings, Current
     }
 }

@@ -7,8 +7,8 @@ namespace Account.Domain.AccountCommands
 {
     public class OpenAccountCommandHandler : ICommandHandler<OpenAccountCommand>
     {
-        readonly EventSourcingHandler<AccountAggregate> _eventSourcingHandler;
-        public OpenAccountCommandHandler(EventSourcingHandler<AccountAggregate> eventSourcingHandler)
+        readonly AccountEventSourcingHandler _eventSourcingHandler;
+        public OpenAccountCommandHandler(AccountEventSourcingHandler eventSourcingHandler)
         {
             this._eventSourcingHandler = eventSourcingHandler;
         }

@@ -1,45 +1,75 @@
 ﻿using Core.Exceptions;
-using Core;
 using Core.Events;
+using Core.Repositories;
+using Cqrs.Core;
+using Account.Domain.Infrastructure;
+using Account.Domain.Events;
+using System.Text.Json;
+using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace Account.Domain
 {
-    public class AccountEventStore
+    public class AccountEventStore : IEventStore
     {
-        IEventStoreRepository eventStoreRepository;
-        public AccountEventStore(IEventStoreRepository eventStoreRepository)
+        EventStoreRepository eventStoreRepository;
+        public AccountEventStore(EventStoreRepository eventStoreRepository)
         {
             this.eventStoreRepository = eventStoreRepository;
         }
 
-        public void SaveEvents(Guid aggregateId, IEnumerable<BaseEvent> events, int expectedVersion)
+        public async Task SaveEvents(Guid aggregateId, IEnumerable<BaseEvent> events, int expectedVersion, CancellationToken cancellationToken = default)
         {
-            var eventStream = eventStoreRepository.FindByAggregateIdentifier(aggregateId);
-            if (expectedVersion != -1 && eventStream.Last().Version != expectedVersion)
+            string aggregateName = nameof(AccountAggregate);
+            var version = await eventStoreRepository.GetAggregateLatestVersion(aggregateId,
+                cancellationToken);
+
+            if (expectedVersion != -1 && version != expectedVersion)
             {
                 throw new ConcurrencyException();
             }
-            var version = expectedVersion;
+
             foreach (var evnt in events)
             {
                 version++;
                 evnt.Version = version;
-                var eventModel = new EventModel
-                {
-                    TimeStamp = DateTime.Now,
-                    AggregateIdentifier = aggregateId,
-                    AggregateType = typeof(AccountAggregate).Name,
-                    Version = version,
-                    EventType = evnt.GetType().Name,
-                    EventData = evnt
-                };
-                var persistedEvent = eventStoreRepository.Save(eventModel);
 
-                if (persistedEvent != null)
-                {
-                    // TODO: produce event to event publisher if didn't use event store
-                }
+                //Saving to event store trigger the event, otherwise, we should push to event bus
+                await eventStoreRepository.Save(aggregateId,
+                    aggregateName, evnt, cancellationToken);
             }
+        }
+
+        async Task<BaseEvent> ParseEvent(EventModel eventModel)
+        {
+            switch (eventModel.EventType)
+            {
+                case nameof(AccountOpenedEvent):
+                    return await JsonSerializer.DeserializeAsync<AccountOpenedEvent>(
+                new MemoryStream(eventModel.EventData.ToArray()));
+                case nameof(AccountClosedEvent):
+                    return await JsonSerializer.DeserializeAsync<AccountClosedEvent>(
+                new MemoryStream(eventModel.EventData?.ToArray()));
+                case nameof(FundsDepositedEvent):
+                    return await JsonSerializer.DeserializeAsync<FundsDepositedEvent>(
+                new MemoryStream(eventModel.EventData.ToArray()));
+                case nameof(FundsWithdrawnEvent):
+                    return await JsonSerializer.DeserializeAsync<FundsWithdrawnEvent>(
+                new MemoryStream(eventModel.EventData.ToArray()));
+                default:
+                    throw new ApplicationException("ParseEvent couldn't find the event to parse to");
+            }
+        }
+
+        public async Task<List<BaseEvent>> GetEvents(Guid aggregateId, CancellationToken cancellationToken = default)
+        {
+            List<BaseEvent> ret = new();
+            List<EventModel> events = await eventStoreRepository.GetAllEvents(aggregateId);
+            foreach (var @event in events)
+            {
+                ret.Add(await ParseEvent(@event));
+            }
+            return ret;
         }
     }
 }

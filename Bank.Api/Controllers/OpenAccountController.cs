@@ -13,22 +13,49 @@ namespace Bank.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class OpenAccountController : ControllerBase
+    public class AccountController : ControllerBase
     {
 
-        private readonly ILogger<OpenAccountController> logger;
+        private readonly ILogger<AccountController> logger;
         private IMediator dispatcher;
 
-        public OpenAccountController(ILogger<OpenAccountController> logger, IMediator dispatcher)
+        public AccountController(ILogger<AccountController> logger, IMediator dispatcher)
         {
             this.logger = logger;
             this.dispatcher = dispatcher;
         }
 
-        [HttpPost("OpenAccount")]
-        public async Task<bool> OpenAccount(OpenAccountCommand command)
+        [HttpPost("open")]
+        public async Task<bool> Open(OpenAccountCommand command)
         {
             command.Id = Guid.NewGuid();
+            return await SendCommand(command);
+        }
+
+        [HttpPost("close/{id}")]
+        public async Task<bool> Close(Guid id, CloseAccountCommand command)
+        {
+            command.Id = id;
+            return await SendCommand(command);
+        }
+
+        [HttpPost("withdraw/{id}")]
+        public async Task<bool> WithdrawFunds(Guid id, WithdrawFundsCommand command)
+        {
+            command.Id = id;
+            return await SendCommand(command);
+        }
+        
+        [HttpPost("deposit/{id}")]
+        public async Task<bool> DepositFunds(Guid id, DepositFundsCommand command)
+        {
+            command.Id = id;
+            return await SendCommand(command);
+        }
+
+        private async Task<bool> SendCommand<T>(T command) where T: ICommand 
+        {
+            var cmd = command as BaseCommand;
             try
             {
                 await dispatcher.Send(command);
@@ -42,7 +69,8 @@ namespace Bank.Api.Controllers
             }
             catch (Exception e)
             {
-                var msg = string.Format("Error while processing request to open a new bank account for id - {0}.", command.Id);
+                var msg = string.Format("Error while processing request for {1} with Id id - {0}.", 
+                    cmd?.Id, command.GetType().Name);
                 logger.LogCritical(msg, e);
                 throw;
             }

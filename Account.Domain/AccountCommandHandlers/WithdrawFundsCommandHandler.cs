@@ -6,8 +6,8 @@ namespace Account.Domain.AccountCommands
 {
     public class WithdrawFundsCommandHandler : ICommandHandler<WithdrawFundsCommand>
     {
-        readonly EventSourcingHandler<AccountAggregate> _eventSourcingHandler;
-        public WithdrawFundsCommandHandler(EventSourcingHandler<AccountAggregate> eventSourcingHandler)
+        readonly AccountEventSourcingHandler _eventSourcingHandler;
+        public WithdrawFundsCommandHandler(AccountEventSourcingHandler eventSourcingHandler)
         {
             _eventSourcingHandler = eventSourcingHandler;
         }

@@ -3,45 +3,50 @@ using System.Reflection;
 
 namespace Cqrs.Core
 {
-    public abstract class AggregateRoot
+    public class AggregateRoot
     {
         public Guid Id { get; protected set; }
         public int Version { get; set; }
 
-        private readonly List<BaseEvent> _changes = new();
-        //   private readonly Logger logger = Logger.getLogger(AggregateRoot.class.getName());
+        private readonly List<BaseEvent> changes = new();
+        //private readonly ILogger logger;
+
+        public AggregateRoot() { 
+        //    this.logger =;
+        }
 
         public List<BaseEvent> GetUncommittedChanges()
         {
-            return this._changes;
+            return changes;
         }
 
         public void CommitChanges()
         {
-            this._changes.Clear();
+            changes.Clear();
         }
 
         protected void ApplyChange(BaseEvent evnt, Boolean isNewEvent)
         {
             try
             {
-                var method = evnt.GetType().GetMethod("Apply",
-                         BindingFlags.NonPublic | BindingFlags.Instance);
+                var method = this.GetType().GetMethod("Apply",
+                         BindingFlags.NonPublic | BindingFlags.Instance,
+                         new Type[]{evnt.GetType()});
                 method.Invoke(this, new[] { evnt });
             }
-            catch (MissingMemberException e)
+            catch (MissingMemberException)
             {
-                //logger.log(Level.WARNING, MessageFormat.format("'Apply' method was not found in the aggregate:{0}", evnt.ToString()));
+                //logger.LogWarning("'Apply' method was not found in the aggregate:{0}", evnt.ToString());
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                //logger.log(Level.SEVERE, "Error applying event to aggregate", e);
+                //logger.LogCritical("Error applying event to aggregate", ex);
             }
             finally
             {
                 if (isNewEvent)
                 {
-                    _changes.Add(evnt);
+                    changes.Add(evnt);
                 }
             }
         }
