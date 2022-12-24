@@ -1,6 +1,4 @@
 ﻿using Core;
-using Core.Commands;
-using Core.Exceptions;
 using Mediator;
 
 namespace Account.Domain.AccountCommands

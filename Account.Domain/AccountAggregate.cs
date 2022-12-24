@@ -8,6 +8,7 @@ namespace Account.Domain
 {
     public class AccountAggregate : AggregateRoot
     {
+        public string AccountHolder { get; set; }
         public decimal Balance { get; private set; }
         public bool Active { get; private set; }
 
@@ -29,6 +30,7 @@ namespace Account.Domain
         private void Apply(AccountOpenedEvent evnt)
         {
             this.Id = evnt.Id;
+            this.AccountHolder = evnt.AccountHolder;
             this.Active = true;
             this.Balance = evnt.OpeningBalance;
         }
@@ -81,7 +83,7 @@ namespace Account.Domain
                         id: this.Id));
         }
 
-        public void Apply(AccountClosedEvent evnt)
+        private void Apply(AccountClosedEvent evnt)
         {
             this.Id = evnt.Id;
             this.Active = false;

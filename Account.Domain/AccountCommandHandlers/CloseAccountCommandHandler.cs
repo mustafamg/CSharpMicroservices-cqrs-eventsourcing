@@ -10,6 +10,7 @@ namespace Account.Domain.AccountCommands
         {
             _eventSourcingHandler = eventSourcingHandler;
         }
+
         public async ValueTask<Unit> Handle(CloseAccountCommand command, CancellationToken cancellationToken)
         {
             var aggregate = await _eventSourcingHandler.GetById(command.Id);

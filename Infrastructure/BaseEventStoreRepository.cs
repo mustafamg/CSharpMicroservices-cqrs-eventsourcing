@@ -1,15 +1,13 @@
-﻿using Core.Events;
+﻿using System.Text.Json;
+using Core.Events;
 using EventStore.Client;
-using System;
-using System.Linq;
-using System.Text.Json;
 
-namespace Account.Domain.Infrastructure
+namespace Infrastructure
 {
-    public class EventStoreRepository
+    public abstract class BaseEventStoreRepository
     {
         EventStoreClient _client;
-        public EventStoreRepository()
+        public BaseEventStoreRepository()
         {
             var connection = EventStoreClientSettings.Create("esdb://127.0.0.1:2113?tls=false&keepAliveTimeout=10000&keepAliveInterval=10000");
             _client = new EventStoreClient(connection);
@@ -37,9 +35,10 @@ namespace Account.Domain.Infrastructure
             var result = _client.ReadStreamAsync(
                             direction,
                             aggregateId.ToString(),
-                            StreamPosition.End,
+                            StreamPosition.Start,
                             cancellationToken: cancellationToken);
-            if (await result.ReadState == ReadState.StreamNotFound)
+            var results = await result.ReadState;
+            if (results == ReadState.StreamNotFound)
             {
                 return new List<ResolvedEvent>();
             }
@@ -54,9 +53,9 @@ namespace Account.Domain.Infrastructure
         {
             var eventData = new EventData
                 (
-                    Uuid.NewUuid(),
-                    type: @event.GetType().Name,
-                   data: JsonSerializer.SerializeToUtf8Bytes(@event),
+                   Uuid.NewUuid(),
+                   type: @event.GetType().Name,
+                   data: SerializeBasedOnEventType(@event),
                    metadata: JsonSerializer.SerializeToUtf8Bytes(new
                    {
                        @event.Version,
@@ -72,6 +71,9 @@ namespace Account.Domain.Infrastructure
                     cancellationToken: cancellationToken
                 );
         }
+
+        protected abstract byte[] SerializeBasedOnEventType(BaseEvent @event);
+
         public async Task<List<EventModel>> GetAllEvents(Guid aggregateId, CancellationToken cancellationToken = default)
         {
             var events = new List<EventModel>();

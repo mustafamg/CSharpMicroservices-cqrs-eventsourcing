@@ -1,27 +1,30 @@
-﻿using Account.Domain;
-using Core.Repositories;
+﻿using Core.Repositories;
 using Cqrs.Core;
 
 namespace Core
 {
-    public class AccountEventSourcingHandler
+    public abstract class BaseEventSourcingHandler<T> where T : AggregateRoot, new()
     {
         private readonly IEventStore eventStore;
+        private readonly T aggregate;
 
-        public AccountEventSourcingHandler(IEventStore eventStore)
+        public BaseEventSourcingHandler(IEventStore eventStore)
         {
             this.eventStore = eventStore;
+            aggregate = new T();
         }
 
-        public async Task Save(AggregateRoot aggregate)
+        public async Task Save(T aggregate)
         {
-            await eventStore.SaveEvents(aggregate.Id, aggregate.GetUncommittedChanges(), aggregate.Version);
+            await eventStore.SaveEvents(
+                aggregate.Id,
+                aggregate.GetUncommittedChanges(),
+                aggregate.Version);
             aggregate.CommitChanges();
         }
 
-        public async Task<AccountAggregate> GetById(Guid id)
+        public async Task<T> GetById(Guid id)
         {
-            var aggregate = new AccountAggregate();
             var events = await eventStore.GetEvents(id);
             if (events != null && events.Any())
             {

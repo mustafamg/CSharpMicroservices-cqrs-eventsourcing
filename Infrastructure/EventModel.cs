@@ -1,9 +1,6 @@
 ﻿using EventStore.Client;
-using System;
-using System.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Core.Events
+namespace Infrastructure
 {
     public struct EventModel
     {
