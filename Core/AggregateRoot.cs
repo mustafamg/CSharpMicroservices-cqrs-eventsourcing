@@ -53,14 +53,14 @@ namespace Cqrs.Core
 
         public void RaiseEvent(BaseEvent evnt)
         {
-            ApplyChange(evnt, true);
+            ApplyChange(evnt, isNewEvent: true);
         }
 
         public void ReplayEvents(IEnumerable<BaseEvent> events)
         {
             foreach (var evnt in events)
             {
-                ApplyChange(evnt, false);
+                ApplyChange(evnt, isNewEvent: false);
             }
         }
     }

@@ -4,6 +4,8 @@ using Core.Repositories;
 
 namespace Infrastructure
 {
+    //TODO: for test automation
+    // https://github.com/linedata/reactive-domain/blob/33d04df1b959fbab9e01af47d5f22a5d9d1d374a/src/ReactiveDomain.Testing/EmbeddedEventStoreFixture.cs
     public abstract class BaseEventStore : IEventStore
     {
         private readonly BaseEventStoreRepository eventStoreRepository;
@@ -24,11 +26,12 @@ namespace Infrastructure
                 throw new ConcurrencyException();
             }
 
+            //TODO: remove the for loop and save all events at once as a one transaction
             foreach (var evnt in events)
             {
                 version++;
                 evnt.Version = version;
-
+                
                 //Saving to event store trigger the event, otherwise, we should push to event bus
                 await eventStoreRepository.Save(aggregateId,
                     _aggregateName, evnt, cancellationToken);

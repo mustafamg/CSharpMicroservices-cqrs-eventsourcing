@@ -1,4 +1,5 @@
 ﻿using Account.Domain.AccountCommands;
+using Account.Domain.Dto;
 using Account.Domain.Events;
 using Core.Exceptions;
 using Cqrs.Core;
@@ -11,6 +12,7 @@ namespace Account.Domain
         public string AccountHolder { get; set; }
         public decimal Balance { get; private set; }
         public bool Active { get; private set; }
+        public AccountType AccountType { get; set; }
 
         public AccountAggregate()
         { 
@@ -33,6 +35,7 @@ namespace Account.Domain
             this.AccountHolder = evnt.AccountHolder;
             this.Active = true;
             this.Balance = evnt.OpeningBalance;
+            this.AccountType = evnt.AccountType;
         }
 
         public void DepositFunds(decimal amount)
@@ -58,6 +61,10 @@ namespace Account.Domain
 
         public void WithdrawFunds(decimal amount)
         {
+            if (amount > this.Balance)
+            {
+                throw new IllegalStateException("Withdrawal declined, insufficient funds!");
+            }
             if (!this.Active)
             {
                 throw new IllegalStateException("Funds cannot be withdrawn from a closed account!");
@@ -75,14 +82,20 @@ namespace Account.Domain
 
         public void CloseAccount()
         {
+            //TODO: Define what should happen to satisify the command
             if (!this.Active)
             {
                 throw new IllegalStateException("The bank account has already been closed!");
             }
+            //TODO: what the event resulted from such command
             RaiseEvent(new AccountClosedEvent(
                         id: this.Id));
         }
 
+        /// <summary>
+        /// Apply just set event state
+        /// </summary>
+        /// <param name="evnt"></param>
         private void Apply(AccountClosedEvent evnt)
         {
             this.Id = evnt.Id;

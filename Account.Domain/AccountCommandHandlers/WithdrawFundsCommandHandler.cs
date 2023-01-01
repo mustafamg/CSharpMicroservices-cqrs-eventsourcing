@@ -14,10 +14,6 @@ namespace Account.Domain.AccountCommands
         public async ValueTask<Unit> Handle(WithdrawFundsCommand command, CancellationToken cancellationToken)
         {
             var aggregate = await _eventSourcingHandler.GetById(command.Id);
-            if (command.Amount > aggregate.Balance)
-            {
-                throw new IllegalStateException("Withdrawal declined, insufficient funds!");
-            }
             aggregate.WithdrawFunds(command.Amount);
             await _eventSourcingHandler.Save(aggregate);
             return new Unit();

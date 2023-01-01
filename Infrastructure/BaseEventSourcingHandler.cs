@@ -6,12 +6,11 @@ namespace Core
     public abstract class BaseEventSourcingHandler<T> where T : AggregateRoot, new()
     {
         private readonly IEventStore eventStore;
-        private readonly T aggregate;
+        private T aggregate;
 
         public BaseEventSourcingHandler(IEventStore eventStore)
         {
             this.eventStore = eventStore;
-            aggregate = new T();
         }
 
         public async Task Save(T aggregate)
@@ -25,6 +24,7 @@ namespace Core
 
         public async Task<T> GetById(Guid id)
         {
+            aggregate = new T();
             var events = await eventStore.GetEvents(id);
             if (events != null && events.Any())
             {

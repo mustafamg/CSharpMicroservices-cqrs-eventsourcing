@@ -15,7 +15,7 @@ namespace Infrastructure
         public async Task<int> GetAggregateLatestVersion(Guid aggregateId, CancellationToken cancellationToken = default)
         {
             List<ResolvedEvent> rawEventStream =
-                await GetAggregateStreamAsync(aggregateId, Direction.Backwards, cancellationToken);
+                await GetAggregateStreamAsync(aggregateId, Direction.Backwards, StreamPosition.End, cancellationToken);
             if (!rawEventStream.Any())
             {
                 return 0;
@@ -30,12 +30,13 @@ namespace Infrastructure
         private async Task<List<ResolvedEvent>> GetAggregateStreamAsync(
             Guid aggregateId,
             Direction direction,
-            CancellationToken cancellationToken)
+            StreamPosition streamPosition,
+            CancellationToken cancellationToken = default)
         {
             var result = _client.ReadStreamAsync(
                             direction,
                             aggregateId.ToString(),
-                            StreamPosition.Start,
+                            streamPosition,
                             cancellationToken: cancellationToken);
             var results = await result.ReadState;
             if (results == ReadState.StreamNotFound)
@@ -78,7 +79,7 @@ namespace Infrastructure
         {
             var events = new List<EventModel>();
             List<ResolvedEvent> rawEventStream =
-                await GetAggregateStreamAsync(aggregateId, Direction.Forwards, cancellationToken);
+                await GetAggregateStreamAsync(aggregateId, Direction.Forwards, StreamPosition.Start, cancellationToken);
             if (!rawEventStream.Any())
             {
                 return events;
