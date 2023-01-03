@@ -13,11 +13,8 @@ namespace Account.Domain.AccountCommands
 
         public async ValueTask<Unit> Handle(OpenAccountCommand command, CancellationToken cancellationToken)
         {
-            if (command is OpenAccountCommand cmd)
-            {
-                var aggregate = new AccountAggregate(cmd);
-                await _eventSourcingHandler.Save(aggregate);
-            }
+            var aggregate = AccountAggregate.OpenAccount(command);
+            await _eventSourcingHandler.Save(aggregate);
             return new Unit();
         }
     }

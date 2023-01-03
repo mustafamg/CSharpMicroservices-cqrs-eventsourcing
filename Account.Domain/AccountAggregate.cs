@@ -15,18 +15,25 @@ namespace Account.Domain
         public AccountType AccountType { get; set; }
 
         public AccountAggregate()
-        { 
-        //todo: do not use, created only to enale new T on GetById method of eventsourcing handler
+        {         
+            //todo: do not use, created only to enale new T on GetById method of eventsourcing handler
         }
 
-        public AccountAggregate(OpenAccountCommand command)
+        public static AccountAggregate OpenAccount(OpenAccountCommand command)
         {
-            RaiseEvent(new AccountOpenedEvent(
+            var aggregate = new AccountAggregate();
+            if(command.OpeningBalance <= 1000)
+            {
+                throw new IllegalStateException("Openning balance should be greater than 1000");
+            }
+
+            aggregate.RaiseEvent(new AccountOpenedEvent(
                         id: command.Id,
                         accountHolder: command.AccountHolder,
                         createdDate: DateTime.Now,
                         accountType: command.AccountType,
                         openingBalance: command.OpeningBalance));
+            return aggregate;
         }
 
         private void Apply(AccountOpenedEvent evnt)
@@ -55,7 +62,6 @@ namespace Account.Domain
 
         private void Apply(FundsDepositedEvent evnt)
         {
-            this.Id = evnt.Id;
             this.Balance += evnt.Amount;
         }
 

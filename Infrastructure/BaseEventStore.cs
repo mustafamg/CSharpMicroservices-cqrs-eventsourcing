@@ -31,11 +31,10 @@ namespace Infrastructure
             {
                 version++;
                 evnt.Version = version;
-                
-                //Saving to event store trigger the event, otherwise, we should push to event bus
-                await eventStoreRepository.Save(aggregateId,
-                    _aggregateName, evnt, cancellationToken);
-            }
+            } 
+            //Saving to event store trigger the event, otherwise, we should push to event bus
+            await eventStoreRepository.Save(aggregateId,
+                    _aggregateName, events, cancellationToken);
         }
 
         protected abstract Task<BaseEvent?> ParseEvent(EventModel eventModel);

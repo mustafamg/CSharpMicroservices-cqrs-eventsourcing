@@ -49,26 +49,26 @@ namespace Infrastructure
 
         public async Task Save(Guid aggregateId,
             string aggregateName,
-            BaseEvent @event,
+            IEnumerable<BaseEvent> events,
             CancellationToken cancellationToken = default)
         {
-            var eventData = new EventData
+            var eventData = events.Select(ev => new EventData
                 (
                    Uuid.NewUuid(),
-                   type: @event.GetType().Name,
-                   data: SerializeBasedOnEventType(@event),
+                   type: ev.GetType().Name,
+                   data: SerializeBasedOnEventType(ev),
                    metadata: JsonSerializer.SerializeToUtf8Bytes(new
                    {
-                       @event.Version,
+                       ev.Version,
                        TimeStamp = DateTime.Now,
                        aggregateName
                    })
-                );
+                ));
 
             await _client.AppendToStreamAsync(
                     aggregateId.ToString(),
                     StreamState.Any,
-                    new[] { eventData },
+                    eventData,
                     cancellationToken: cancellationToken
                 );
         }
