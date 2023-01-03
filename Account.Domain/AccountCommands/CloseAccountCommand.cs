@@ -3,8 +3,5 @@ using Mediator;
 
 namespace Account.Domain.AccountCommands
 {
-    public class CloseAccountCommand : BaseCommand, ICommand
-    {
-        public CloseAccountCommand(Guid id) : base(id) { }
-    }
+    public record CloseAccountCommand(Guid Id) : BaseCommand(Id), ICommand;
 }

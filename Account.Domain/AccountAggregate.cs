@@ -82,7 +82,6 @@ namespace Account.Domain
 
         private void Apply(FundsWithdrawnEvent evnt)
         {
-            this.Id = evnt.Id;
             this.Balance -= evnt.Amount;
         }
 
@@ -104,7 +103,6 @@ namespace Account.Domain
         /// <param name="evnt"></param>
         private void Apply(AccountClosedEvent evnt)
         {
-            this.Id = evnt.Id;
             this.Active = false;
         }
     }

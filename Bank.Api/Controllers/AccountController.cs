@@ -28,28 +28,29 @@ namespace Bank.Api.Controllers
         [HttpPost("open")]
         public async Task<bool> Open(OpenAccountCommand command)
         {
-            command.Id = Guid.NewGuid();
+            var openAccountCommand = new OpenAccountCommand(
+                Guid.NewGuid(), 
+                command.AccountHolder,
+                command.AccountType,
+                command.OpeningBalance);
+            return await SendCommand(openAccountCommand);
+        }
+
+        [HttpPost("close")]
+        public async Task<bool> Close(CloseAccountCommand command)
+        {
             return await SendCommand(command);
         }
 
-        [HttpPost("close/{id}")]
-        public async Task<bool> Close(Guid id, CloseAccountCommand command)
+        [HttpPost("withdraw")]
+        public async Task<bool> WithdrawFunds(WithdrawFundsCommand command)
         {
-            command.Id = id;
-            return await SendCommand(command);
-        }
-
-        [HttpPost("withdraw/{id}")]
-        public async Task<bool> WithdrawFunds(Guid id, WithdrawFundsCommand command)
-        {
-            command.Id = id;
             return await SendCommand(command);
         }
         
         [HttpPost("deposit/{id}")]
-        public async Task<bool> DepositFunds(Guid id, DepositFundsCommand command)
+        public async Task<bool> DepositFunds(DepositFundsCommand command)
         {
-            command.Id = id;
             return await SendCommand(command);
         }
 
