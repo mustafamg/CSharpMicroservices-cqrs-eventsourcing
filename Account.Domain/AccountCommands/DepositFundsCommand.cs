@@ -1,4 +1,4 @@
-﻿using Core;
+﻿using Common.Infrastructure.Core.BaseModels;
 using Mediator;
 
 namespace Account.Domain.AccountCommands

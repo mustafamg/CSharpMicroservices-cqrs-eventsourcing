@@ -1,4 +1,4 @@
-﻿using Core.Events;
+﻿using Common.Infrastructure.Core.BaseModels;
 
 namespace Account.Domain.Events
 {

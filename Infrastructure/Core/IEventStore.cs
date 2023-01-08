@@ -1,4 +1,5 @@
-﻿using Core.Events;
+﻿using Common.Infrastructure.Core.BaseModels;
+
 namespace Core.Repositories
 {
     public interface IEventStore

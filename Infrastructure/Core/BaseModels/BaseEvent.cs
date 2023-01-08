@@ -1,6 +1,7 @@
-﻿namespace Core.Events
+﻿namespace Common.Infrastructure.Core.BaseModels
 {
-    public class BaseEvent{
+    public class BaseEvent
+    {
         public BaseEvent(Guid id)
         {
             Id = id;

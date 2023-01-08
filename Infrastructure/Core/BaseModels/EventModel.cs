@@ -1,6 +1,6 @@
 ﻿using EventStore.Client;
 
-namespace Infrastructure
+namespace Common.Infrastructure.Core.BaseModels
 {
     public struct EventModel
     {

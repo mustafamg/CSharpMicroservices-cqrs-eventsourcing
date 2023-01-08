@@ -1,7 +1,7 @@
 ﻿using Account.Domain.Events;
 using Infrastructure;
-using Core.Events;
 using System.Text.Json;
+using Common.Infrastructure.Core.BaseModels;
 
 namespace Account.Domain.Infrastructure
 {

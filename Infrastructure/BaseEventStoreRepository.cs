@@ -1,10 +1,11 @@
 ﻿using System.Text.Json;
-using Core.Events;
+using Common.Infrastructure.Core;
+using Common.Infrastructure.Core.BaseModels;
 using EventStore.Client;
 
 namespace Infrastructure
 {
-    public abstract class BaseEventStoreRepository
+    public abstract class BaseEventStoreRepository : IEventStoreRepository
     {
         EventStoreClient _client;
         public BaseEventStoreRepository()

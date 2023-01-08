@@ -1,5 +1,5 @@
 ﻿using Account.Domain.Dto;
-using Core.Events;
+using Common.Infrastructure.Core.BaseModels;
 using Mediator;
 
 namespace Account.Domain.Events

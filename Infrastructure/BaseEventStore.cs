@@ -1,4 +1,4 @@
-﻿using Core.Events;
+﻿using Common.Infrastructure.Core.BaseModels;
 using Core.Exceptions;
 using Core.Repositories;
 

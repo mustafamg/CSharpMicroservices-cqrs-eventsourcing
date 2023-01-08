@@ -4,7 +4,7 @@ using System.Net;
 using Core.Exceptions;
 using Mediator;
 using System.Text;
-using Core;
+using Common.Infrastructure.Core.BaseModels;
 
 namespace Bank.Api.Controllers
 {
