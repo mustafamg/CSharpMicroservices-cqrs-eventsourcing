@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Reflection.Emit;
-using System;
-using Core.Commands;
-using Account.Domain;
 using Account.Domain.AccountCommands;
 using System.Net;
 using Core.Exceptions;
 using Mediator;
+using System.Text;
+using Core;
 
 namespace Bank.Api.Controllers
 {
@@ -28,12 +25,7 @@ namespace Bank.Api.Controllers
         [HttpPost("open")]
         public async Task<bool> Open(OpenAccountCommand command)
         {
-            var openAccountCommand = new OpenAccountCommand(
-                Guid.NewGuid(), 
-                command.AccountHolder,
-                command.AccountType,
-                command.OpeningBalance);
-            return await SendCommand(openAccountCommand);
+            return await SendCommand(command);
         }
 
         [HttpPost("close")]
@@ -56,7 +48,7 @@ namespace Bank.Api.Controllers
 
         private async Task<bool> SendCommand<T>(T command) where T: ICommand 
         {
-            var cmd = command as BaseCommand;
+            var cmd = command as Message;
             try
             {
                 await dispatcher.Send(command);

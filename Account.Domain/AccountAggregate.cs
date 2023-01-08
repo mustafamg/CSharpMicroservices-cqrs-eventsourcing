@@ -28,7 +28,7 @@ namespace Account.Domain
             }
 
             aggregate.RaiseEvent(new AccountOpenedEvent(
-                        id: command.Id,
+                        id: Guid.NewGuid(),
                         accountHolder: command.AccountHolder,
                         createdDate: DateTime.Now,
                         accountType: command.AccountType,

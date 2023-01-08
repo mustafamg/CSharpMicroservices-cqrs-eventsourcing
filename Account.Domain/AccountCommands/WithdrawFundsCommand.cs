@@ -1,7 +1,7 @@
-﻿using Core.Commands;
+﻿using Core;
 using Mediator;
 
 namespace Account.Domain.AccountCommands
 {
-    public record WithdrawFundsCommand(Guid Id, decimal Amount) : BaseCommand(Id), ICommand;
+    public record WithdrawFundsCommand(Guid Id, decimal Amount) : Message(Id), ICommand;
 }
