@@ -19,13 +19,20 @@ namespace Account.Domain
             //todo: do not use, created only to enale new T on GetById method of eventsourcing handler
         }
 
+        /// <summary>
+        /// Factory function to create the account aggregate
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        /// <exception cref="IllegalStateException"></exception>
         public static AccountAggregate OpenAccount(OpenAccountCommand command)
         {
-            var aggregate = new AccountAggregate();
             if(command.OpeningBalance <= 1000)
             {
                 throw new IllegalStateException("Openning balance should be greater than 1000");
             }
+
+            var aggregate = new AccountAggregate();
 
             aggregate.RaiseEvent(new AccountOpenedEvent(
                         id: Guid.NewGuid(),
@@ -75,6 +82,7 @@ namespace Account.Domain
             {
                 throw new IllegalStateException("Funds cannot be withdrawn from a closed account!");
             }
+
             RaiseEvent(new FundsWithdrawnEvent(
                         id: this.Id,
                         amount: amount));
